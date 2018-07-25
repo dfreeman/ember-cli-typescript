@@ -82,9 +82,14 @@ class WatchedBuild extends EventEmitter {
     this._ember = ember;
     this._ember.stdout.on('data', (data) => {
       let output = data.toString();
+      process.stdout.write(output);
       if (output.includes('Build successful')) {
         this.emit('did-rebuild');
       }
+    });
+
+    this._ember.stderr.on('data', (data) => {
+      process.stdout.write(data.toString());
     });
 
     this._ember.catch((error) => {
@@ -93,6 +98,7 @@ class WatchedBuild extends EventEmitter {
   }
 
   waitForBuild() {
+    console.log('waiting for build...');
     return new Promise((resolve, reject) => {
       this.once('did-rebuild', resolve);
       this.once('did-error', reject);

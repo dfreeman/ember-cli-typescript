@@ -17,40 +17,42 @@ describe('Acceptance: build', function() {
     this.app.teardown();
   });
 
-  it('builds and rebuilds files', co.wrap(function*() {
-    this.app.writeFile('app/app.ts', `
-      export function add(a: number, b: number) {
-        return a + b;
-      }
-    `);
+  for (let i = 0; i < 10; i++) {
+    it('builds and rebuilds files', co.wrap(function*() {
+      this.app.writeFile('app/app.ts', `
+        export function add(a: number, b: number) {
+          return a + b;
+        }
+      `);
 
-    let server = this.app.serve();
+      let server = this.app.serve();
 
-    yield server.waitForBuild();
+      yield server.waitForBuild();
 
-    expectModuleBody(this.app, 'skeleton-app/app', `
-      exports.add = add;
-      function add(a, b) {
-        return a + b;
-      }
-    `);
+      expectModuleBody(this.app, 'skeleton-app/app', `
+        exports.add = add;
+        function add(a, b) {
+          return a + b;
+        }
+      `);
 
-    this.app.writeFile('app/app.ts', `
-      export const foo: string = 'hello';
-    `);
+      this.app.writeFile('app/app.ts', `
+        export const foo: string = 'hello';
+      `);
 
-    yield server.waitForBuild();
+      yield server.waitForBuild();
 
-    expectModuleBody(this.app, 'skeleton-app/app', `
-      var foo = exports.foo = 'hello';
-    `);
-  }));
+      expectModuleBody(this.app, 'skeleton-app/app', `
+        var foo = exports.foo = 'hello';
+      `);
+    }));
+  }
 
-  it('fails the build when noEmitOnError is set and an error is emitted', co.wrap(function*() {
-    this.app.writeFile('app/app.ts', `import { foo } from 'nonexistent';`);
+  // it('fails the build when noEmitOnError is set and an error is emitted', co.wrap(function*() {
+  //   this.app.writeFile('app/app.ts', `import { foo } from 'nonexistent';`);
 
-    yield expect(this.app.build()).to.be.rejectedWith(`Cannot find module 'nonexistent'`);
-  }));
+  //   yield expect(this.app.build()).to.be.rejectedWith(`Cannot find module 'nonexistent'`);
+  // }));
 });
 
 function extractModuleBody(script, moduleName) {

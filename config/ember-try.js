@@ -1,6 +1,6 @@
 module.exports = {
   useYarn: true,
-  command: 'ember test && yarn nodetest',
+  command: 'yarn mocha node-tests/acceptance/build-test.js', // 'ember test && yarn nodetest',
   scenarios: [
     {
       name: 'defaults',
