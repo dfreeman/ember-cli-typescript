@@ -22,7 +22,7 @@ module.exports = class SkeletonApp {
       throw new Error('Already serving');
     }
 
-    return this._watched = new WatchedBuild(this._ember(['serve']));
+    return this._watched = new WatchedBuild(this._ember(['serve', '--watcher=polling']));
   }
 
   updatePackageJSON(callback) {
